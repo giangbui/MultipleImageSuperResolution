@@ -16,6 +16,7 @@ import h5py
 import time
 
 
+
 from PIL import Image
 
 import sys
@@ -28,7 +29,7 @@ import caffe
 net_caffe = caffe.Net('VDSR_net.prototxt', '_iter_VDSR_Official.caffemodel', caffe.TEST)
 layers_caffe = dict(zip(list(net_caffe._layer_names), net_caffe.layers))
 
-
+# set test mode
 TEST_MODE = False
 
 SCALE_BASE = 1.05
