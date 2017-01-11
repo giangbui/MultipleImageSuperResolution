@@ -426,7 +426,7 @@ def main(num_epochs = NUM_EPOCHS):
 #==============================================================================
            
         
-    with np.load('MVDSR/MVDSR_5.npz') as fi:
+    with np.load('MVDSR/MVDSR_25.npz') as fi:
           param_values = [fi['arr_%d' % i] for i in range(len(fi.files))]	
           lasagne.layers.set_all_param_values(l_out, param_values)
 #    with np.load('MVDSR/official/MVDSR_65.npz') as fi:
@@ -514,45 +514,43 @@ def main(num_epochs = NUM_EPOCHS):
     def test(s):
         print("Enter test mode")
        
-        mat_contents = sio.loadmat('testingImgSet14MulScale'+str(s)+'.mat')
-        imgs = mat_contents['testingImg']
-        _,numImg = imgs.shape
-        numImg = numImg -2
+        mat_contents = sio.loadmat('preprocessing_code/testingImg.mat')
+        testData = mat_contents['testData']
+        imgs = testData[0][0]
+        print(imgs.shape)
+        numImg,_,H,W,_ = imgs.shape
         avg_psnr = 0.0
-        num_img = 0          
+        num_img = 0     
+        input_data = imgs[:,:,:,:,0]*1.0/255
+        highRes =  probs(input_data)*255
+        
+        
         for i in xrange(numImg):
             
-            gtImg =  imgs[0,2+i][SEQ_LEN,:,:]
-            H,W = gtImg.shape
-            print(gtImg.shape)
-            seq = np.zeros((1,SEQ_LEN,H,W))
-            seq[0,:,:,:] = imgs[0,2+i][0:SEQ_LEN,:,:]
-            
-            
-            seq= seq*1.0/255
-            highRes =  probs(seq)*255
-            highRes = np.round(highRes[0,0,:,:])
-            highRes = highRes.astype(np.uint8)
-            #highRes = np.clip(highRes,0,255)
-            
-            #compute psnr
-            #mse = np.sum(np.sum(((np.array(highResYCbCr)[:,:,0] - np.array(ycbcr)[:,:,0])**2)))/(H*W)
-            #mse = np.sum(np.sum((highRes-gtImg)**2))/(H*W)
-            mse = np.sum(np.sum((highRes[2:H-2,2:W-2]-gtImg[2:H-2,2:W-2])**2))/((H-4)*(W-4))
-            
-            psnr = 10*math.log10((255**2)/mse)
-            print(" PSNR of {}: {}".format(i,psnr))
-            #for loop in xrange(0):
-            #    W,H = highResYCbCr.size
-            #    highResYCbCr = upscale(highResYCbCr, int(H*SCALE_BASE), int(SCALE_BASE*W))
-            avg_psnr = avg_psnr + psnr
-            num_img = num_img + 1     
+           
+#            seq = np.zeros((1,SEQ_LEN,H,W))
+#            seq[0,:,:,:] = imgs[i,:,:,:]
+#            
+#            
+#            seq= seq*1.0/255
+#            highRes =  probs(seq)*255
+#            highRes = np.round(highRes[0,0,:,:])
+#            highRes = highRes.astype(np.uint8)
+#           
+#            #mse = np.sum(np.sum((highRes-gtImg)**2))/(H*W)
+#            mse = np.sum(np.sum((highRes[2:H-2,2:W-2]-gtImg[2:H-2,2:W-2])**2))/((H-4)*(W-4))
+#            
+#            psnr = 10*math.log10((255**2)/mse)
+#            print(" PSNR of {}: {}".format(i,psnr))
+#           
+#            avg_psnr = avg_psnr + psnr
+#            num_img = num_img + 1     
             print(highRes.shape)
-            scipy.misc.imsave("file_" + str(i)+"_x"+str(s)+"_sp.bmp",highRes)
+            scipy.misc.imsave("file_" + str(i)+"_x"+str(s)+"_sp.bmp",highRes[i,0,:,:])
             #hastableImg =np.zeros(highRes.shape)
             #print(hastableImg.shape)
-            sio.savemat("file_" + str(i)+"_x"+str(s)+"_sp.mat", {'Yimage':highRes})
-        print("(scale {})avreage PSNR {}".format(s,avg_psnr/num_img))
+        sio.savemat("output_sp.mat", {'Yimage':highRes})
+        #print("(scale {})avreage PSNR {}".format(s,avg_psnr/num_img))
     if TEST_MODE:        
         
         
@@ -590,8 +588,8 @@ def main(num_epochs = NUM_EPOCHS):
    
        
        for epoch in range(num_epochs):
-           #if(epoch % 2 == 0):
-               #test(2)
+           if(epoch % 2 == 0):
+               test(2)
            #    test(3)
                #test(4)
            if (epoch % 20 == 0 and epoch > 0):
