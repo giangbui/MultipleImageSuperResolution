@@ -382,6 +382,7 @@ def main(num_epochs = NUM_EPOCHS):
         
                 
     if TEST_MODE:
+    	print("testing ...")
         test(SCALE_FACTOR)
         return 1
         onlyfiles = [f for f in listdir("/home/titanx1/Lasagne/examples/superRes/Test/Set5") if isfile(join("/home/titanx1/Lasagne/examples/superRes/Test/Set5", f))]
