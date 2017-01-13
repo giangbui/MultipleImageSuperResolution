@@ -426,7 +426,7 @@ def main(num_epochs = NUM_EPOCHS):
 #==============================================================================
            
         
-    with np.load('MVDSR/MVDSR_25.npz') as fi:
+    with np.load('MVDSR/official/MVDSR_5-softZ.npz') as fi:
           param_values = [fi['arr_%d' % i] for i in range(len(fi.files))]	
           lasagne.layers.set_all_param_values(l_out, param_values)
 #    with np.load('MVDSR/official/MVDSR_65.npz') as fi:
